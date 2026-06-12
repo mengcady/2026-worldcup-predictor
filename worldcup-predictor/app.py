@@ -27,7 +27,7 @@ from models.tournament import Tournament, Match
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.urandom(24).hex()
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Global state
 predictor = ScorePredictor()
@@ -343,6 +343,12 @@ def api_predict():
        pred = ELOBasedPredictor.predict(home_rating, away_rating)
 
    return jsonify(pred)
+
+
+@app.route("/health")
+def health_check():
+    """Health check endpoint for Railway."""
+    return {"status": "ok"}, 200
 
 
 @app.route("/api/status")

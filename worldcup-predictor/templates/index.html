@@ -1,112 +1,112 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIFA World Cup Predictor 2026</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>FIFA World Cup Predictor 2026</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-title">
-            <div>
-                <h1>FIFA <span>World Cup</span> Predictor</h1>
-                <div class="subtitle">ML-Powered Score Prediction &amp; Tournament Simulation</div>
-            </div>
-        </div>
-        <div class="header-controls">
-            <span id="status-badge" class="status-badge training">Initializing...</span>
-            <span id="status-text" style="font-size:12px;color:var(--text-secondary);">Connecting...</span>
-            <button id="train-btn" class="btn btn-amber btn-sm">Re-Train Model</button>
-            <button id="simulate-btn" class="btn btn-success">Start Simulation</button>
-        </div>
-    </header>
+   <!-- Header -->
+   <header class="header">
+       <div class="header-title">
+           <div>
+               <h1>FIFA <span>World Cup</span> Predictor</h1>
+               <div class="subtitle">ML-Powered Score Prediction &amp; Tournament Simulation</div>
+           </div>
+       </div>
+       <div class="header-controls">
+           <span id="status-badge" class="status-badge training">Initializing...</span>
+           <span id="status-text" style="font-size:12px;color:var(--text-secondary);">Connecting...</span>
+           <button id="train-btn" class="btn btn-amber btn-sm">Re-Train Model</button>
+           <button id="simulate-btn" class="btn btn-success">Start Simulation</button>
+       </div>
+   </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Predict Panel -->
-        <div class="predict-panel">
-            <h3>Match Predictor</h3>
-            <div class="team-selectors">
-                <select id="home-team">
-                    <option value="">Select home team</option>
-                </select>
-                <span class="vs">vs</span>
-                <select id="away-team">
-                    <option value="">Select away team</option>
-                </select>
-                <button id="predict-btn" class="btn btn-primary">Predict</button>
-            </div>
+   <!-- Main Content -->
+   <div class="container">
+       <!-- Predict Panel -->
+       <div class="predict-panel">
+           <h3>Match Predictor</h3>
+           <div class="team-selectors">
+               <select id="home-team">
+                   <option value="">Select home team</option>
+               </select>
+               <span class="vs">vs</span>
+               <select id="away-team">
+                   <option value="">Select away team</option>
+               </select>
+               <button id="predict-btn" class="btn btn-primary">Predict</button>
+           </div>
 
-            <div id="prediction-result" class="prediction-result">
-                <div class="score-display">
-                    <div class="predicted-score">-</div>
-                    <div style="font-size:12px;color:var(--text-muted);">Most Likely Score</div>
-                </div>
-                <div class="expected-labels">
-                    <span class="exp-home">-</span>
-                    <span>Expected Goals (xG)</span>
-                    <span class="exp-away">-</span>
-                </div>
-                <div class="big-bar">
-                    <div class="seg-win" style="width:33%"></div>
-                    <div class="seg-draw" style="width:33%"></div>
-                    <div class="seg-lose" style="width:33%"></div>
-                </div>
-                <div class="proba-detail">
-                    <span class="p-win">-</span>
-                    <span class="p-draw">-</span>
-                    <span class="p-lose">-</span>
-                </div>
-                <div style="margin-top:14px;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
-                    Score Probability Matrix (Home to Away)
-                </div>
-                <div class="score-grid"></div>
-            </div>
-        </div>
+           <div id="prediction-result" class="prediction-result">
+               <div class="score-display">
+                   <div class="predicted-score">-</div>
+                   <div style="font-size:12px;color:var(--text-muted);">Most Likely Score</div>
+               </div>
+               <div class="expected-labels">
+                   <span class="exp-home">-</span>
+                   <span>Expected Goals (xG)</span>
+                   <span class="exp-away">-</span>
+               </div>
+               <div class="big-bar">
+                   <div class="seg-win" style="width:33%"></div>
+                   <div class="seg-draw" style="width:33%"></div>
+                   <div class="seg-lose" style="width:33%"></div>
+               </div>
+               <div class="proba-detail">
+                   <span class="p-win">-</span>
+                   <span class="p-draw">-</span>
+                   <span class="p-lose">-</span>
+               </div>
+               <div style="margin-top:14px;font-size:11px;color:var(--text-muted);margin-bottom:4px;">
+                   Score Probability Matrix (Home to Away)
+               </div>
+               <div class="score-grid"></div>
+           </div>
+       </div>
 
-        <!-- Tabs -->
-        <div class="tabs">
-            <button id="tab-groups" class="tab active">Group Stage</button>
-            <button id="tab-knockout" class="tab">Knockout Stage</button>
-        </div>
+       <!-- Tabs -->
+       <div class="tabs">
+           <button id="tab-groups" class="tab active">Group Stage</button>
+           <button id="tab-knockout" class="tab">Knockout Stage</button>
+       </div>
 
-        <!-- Group Stage -->
-        <div id="groups-content" class="tab-content active">
-            <h2 style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">
-                Group Standings
-            </h2>
-            <div id="groups-container" class="groups-grid">
-                <div class="loading-text">Waiting for data...</div>
-            </div>
-            <h2 style="font-size:16px;font-weight:600;margin-bottom:12px;margin-top:20px;color:var(--text-secondary);">
-                Match Results &amp; Predictions
-            </h2>
-            <div id="matches-container" class="matches-grid">
-                <div class="loading-text">Waiting for data...</div>
-            </div>
-        </div>
+       <!-- Group Stage -->
+       <div id="groups-content" class="tab-content active">
+           <h2 style="font-size:16px;font-weight:600;margin-bottom:12px;color:var(--text-secondary);">
+               Group Standings
+           </h2>
+           <div id="groups-container" class="groups-grid">
+               <div class="loading-text">Waiting for data...</div>
+           </div>
+           <h2 style="font-size:16px;font-weight:600;margin-bottom:12px;margin-top:20px;color:var(--text-secondary);">
+               Match Results &amp; Predictions
+           </h2>
+           <div id="matches-container" class="matches-grid">
+               <div class="loading-text">Waiting for data...</div>
+           </div>
+       </div>
 
-        <!-- Knockout Stage -->
-        <div id="knockout-content" class="tab-content">
-            <div id="winner-banner" class="winner-banner">
-                <div class="trophy-icon">&#x1F3C6;</div>
-                <h2>World Cup Champion</h2>
-                <p id="winner-name" style="font-size:24px;font-weight:700;color:var(--accent-amber);">-</p>
-            </div>
-            <div id="bracket-container" class="bracket-container">
-                <div class="loading-text">Knockout bracket will appear after group stage completes.</div>
-            </div>
-        </div>
+       <!-- Knockout Stage -->
+       <div id="knockout-content" class="tab-content">
+           <div id="winner-banner" class="winner-banner">
+               <div class="trophy-icon">&#x1F3C6;</div>
+               <h2>World Cup Champion</h2>
+               <p id="winner-name" style="font-size:24px;font-weight:700;color:var(--accent-amber);">-</p>
+           </div>
+           <div id="bracket-container" class="bracket-container">
+               <div class="loading-text">Knockout bracket will appear after group stage completes.</div>
+           </div>
+       </div>
 
-        <!-- Log -->
-        <div id="training-log" class="log-panel">
-            <div class="log-entry"><span class="time">[--]</span> System initialized</div>
-        </div>
-    </div>
+       <!-- Log -->
+       <div id="training-log" class="log-panel">
+           <div class="log-entry"><span class="time">[--]</span> System initialized</div>
+       </div>
+   </div>
 
-    <script src="{{ url_for('static', filename='app.js') }}"></script>
+   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>
